@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"strconv"
 	"strings"
@@ -10,29 +11,28 @@ func main() {
 	value1 := "10"
 	value2 := "5.5"
 	operation := "+"
-	result := calculate(value1, value2, operation)
+	result, _ := calculate(value1, value2, operation)
 	fmt.Println(result)
 }
 
 // calculate() returns the result of the requested operation.
-func calculate(input1 string, input2 string, operation string) float64 {
+func calculate(input1 string, input2 string, operation string) (float64, error) {
 	input1Converted := convertInputToValue(input1)
 	input2Converted := convertInputToValue(input2)
-	result := 0.0
-	if operation == "+" {
-		result = addValues(input1Converted, input2Converted)
-		return result
-	} else if operation == "-" {
-		result = subtractValues(input1Converted, input2Converted)
-		return result
-	} else if operation == "*" {
-		result = multiplyValues(input1Converted, input2Converted)
-		return result
-	} else if operation == "/" {
-		result = divideValues(input1Converted, input2Converted)
-		return result
-	} else {
-		panic("Invalid operation")
+	switch operation {
+	case "+":
+		return addValues(input1Converted, input2Converted), nil
+	case "-":
+		return subtractValues(input1Converted, input2Converted), nil
+	case "*":
+		return multiplyValues(input1Converted, input2Converted), nil
+	case "/":
+		if input2Converted == 0 {
+			return 0, errors.New("division by zero")
+		}
+		return divideValues(input1Converted, input2Converted), nil
+	default:
+		return 0, fmt.Errorf("invalid operation: %v", operation)
 	}
 }
 
