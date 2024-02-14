@@ -2,17 +2,7 @@ package main
 
 import (
 	"testing"
-
-	"github.com/stretchr/testify/assert"
 )
-
-const value1 = "10"
-const value2 = "5.5"
-const operation = "+"
-
-func TestCalculate(t *testing.T) {
-	assert.Equal(t, calculate(value1, value2, operation), 15.5, "Result is incorrect")
-}
 
 func TestCalculateTable(t *testing.T) {
 	tests := []struct {
@@ -21,16 +11,24 @@ func TestCalculateTable(t *testing.T) {
 		input2    string
 		operation string
 		want      float64
+		wantErr   bool
 	}{
-		{"Addition", "10", "5.5", "+", 15.5},
-		{"Subtraction", "10", "5.5", "-", 4.5},
-		{"Multiplication", "10", "5.5", "*", 55},
-		{"Division", "10", "5.5", "/", 1.8181818181818181},
+		{"Addition", "10", "5.5", "+", 15.5, false},
+		{"Subtraction", "10", "5.5", "-", 4.5, false},
+		{"Multiplication", "10", "5.5", "*", 55, false},
+		{"Division", "10", "5.5", "/", 1.8181818181818181, false},
+		{"Invalid operation", "10", "5.5", "%", 0, true},
+		{"Divide by zero", "10", "0", "/", 0, true},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := calculate(tt.input1, tt.input2, tt.operation); got != tt.want {
+			got, err := calculate(tt.input1, tt.input2, tt.operation)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("calculate() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if got != tt.want {
 				t.Errorf("calculate() = %v, want %v", got, tt.want)
 			}
 		})
